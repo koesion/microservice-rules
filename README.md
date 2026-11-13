@@ -266,6 +266,20 @@ references:
 A checklist is a YAML file at `checklists/<slug>.yaml` with a title, a
 description and an ordered list of rule ids.
 
+A checklist with a `rating` block is also a **scorecard**: every service gets
+a Level 0 to 3 on it. The scale is the same on every scorecard and comes from
+rule priority. Level 1 means every critical rule is met, Level 2 adds the high
+rules, and Level 3 adds the medium ones. Low-priority rules move the score but
+never block a level. A scorecard can only set the level expected of each
+service tier:
+
+```yaml
+rating: {}                    # default targets: tier 1 → Level 3, tier 2 → Level 2, tier 3 → Level 1
+# or
+rating:
+  targets: { 1: 3, 2: 3 }     # override some tiers; the rest keep the default
+```
+
 Two header fields connect a rule to MICROSERVICE.md:
 
 - `check` names an automatic check. A rule with one is evaluated against the

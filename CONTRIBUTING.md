@@ -56,6 +56,13 @@ meantime: the rule is then ticked by hand.
 
 `schema/registry.json` is generated from the app. Please do not edit it.
 
+### Scorecards
+
+A checklist with a `rating` block is a scorecard (see the README). Adding a
+rule to a scorecard, or changing a rule's `priority`, can change the level of
+every service rated on it, so say so in the pull request. A scorecard needs at
+least one critical, one high and one medium rule; the validator checks this.
+
 ## Before you open a pull request
 
 ```bash

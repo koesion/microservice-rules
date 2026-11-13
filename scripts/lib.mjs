@@ -20,6 +20,7 @@ const RULE_FIELDS = {
   optional: ['skill', 'wizardStep', 'check', 'appliesWhen'],
 }
 const CHECKLIST_FIELDS = ['slug', 'version', 'title', 'description', 'ruleIds']
+const CHECKLIST_OPTIONAL = ['rating']
 
 const isText = (v) => typeof v === 'string' && v.trim().length > 0
 const isVersion = (v) => Number.isInteger(v) && v > 0
@@ -119,10 +120,13 @@ function parseChecklist(path) {
     return { errors: [`${where}: invalid YAML: ${e.message.split('\n')[0]}`] }
   }
   if (!doc || typeof doc !== 'object' || Array.isArray(doc)) return { errors: [`${where}: must be a YAML mapping`] }
+  const ruleIds = Array.isArray(doc.ruleIds) ? doc.ruleIds.filter(isText) : []
 
-  for (const key of Object.keys(doc)) if (!CHECKLIST_FIELDS.includes(key)) fail(`unknown field '${key}'`)
+  for (const key of Object.keys(doc)) {
+    if (!CHECKLIST_FIELDS.includes(key) && !CHECKLIST_OPTIONAL.includes(key)) fail(`unknown field '${key}'`)
+  }
   for (const key of CHECKLIST_FIELDS) if (doc[key] === undefined) fail(`missing field '${key}'`)
-  if (errors.length) return { errors }
+  if (errors.length) return { errors, ruleIds }
 
   const expectedSlug = where.split('/').pop().replace(/\.ya?ml$/, '')
   if (typeof doc.slug !== 'string' || !SLUG.test(doc.slug)) fail('slug must be lower-case words joined by hyphens')
@@ -134,7 +138,39 @@ function parseChecklist(path) {
     fail('ruleIds must list at least one rule id')
   }
 
-  return { errors, checklist: { ...doc, path: where } }
+  if (doc.rating !== undefined) checkRating(doc.rating, fail)
+
+  return { errors, checklist: { ...doc, path: where }, ruleIds }
+}
+
+const isMapping = (v) => !!v && typeof v === 'object' && !Array.isArray(v)
+
+// `rating` makes a checklist a scorecard: every service gets a Level 0 to 3 on
+// it. The scale is fixed (schema/registry.json, "rating"); a scorecard may only
+// set, per service tier, the level expected of it. `rating: {}` keeps the defaults.
+function checkRating(rating, fail) {
+  const { serviceTiers, levelPriorities } = registry.rating
+  if (!isMapping(rating)) return fail('rating must be a mapping, such as {} for the default targets')
+  for (const key of Object.keys(rating)) {
+    if (key !== 'targets') fail(`rating: unknown field '${key}'. A scorecard only sets 'targets'`)
+  }
+  if (rating.targets === undefined) return
+  if (!isMapping(rating.targets)) return fail('rating.targets must map a service tier to a level')
+  const tiers = serviceTiers.map(String)
+  const levels = levelPriorities.map((_, i) => i + 1)
+  for (const [tier, level] of Object.entries(rating.targets)) {
+    if (!tiers.includes(tier)) fail(`rating.targets: '${tier}' is not a service tier (${tiers.join(', ')})`)
+    else if (!levels.includes(level)) fail(`rating.targets.${tier} must be a level from ${levels[0]} to ${levels.at(-1)}`)
+  }
+}
+
+// A scorecard's levels come from rule priority, so it needs a rule at each
+// priority a level asks for; otherwise that level would be reached by default.
+function checkScorecardLevels(checklist, rules) {
+  const priorities = new Set(checklist.ruleIds.map((id) => rules.get(id)?.priority))
+  return registry.rating.levelPriorities.flatMap((priority, i) =>
+    priorities.has(priority) ? [] : [`${checklist.path}: has no ${priority} rule, so Level ${i + 1} would be empty`],
+  )
 }
 
 /** Every rule and checklist, with the errors found in them and between them. */
@@ -157,9 +193,14 @@ export function loadLibrary() {
     else invalid.add(`${parts[1]}.${parts[2].replace(/\.md$/, '')}`)
   }
 
+  // Rule ids named by any checklist, valid or not, so one broken checklist
+  // doesn't also report every rule it lists as "in no checklist".
+  const listed = new Set()
+
   for (const path of files(join(ROOT, 'checklists'), ['.yaml', '.yml'])) {
     const result = parseChecklist(path)
     errors.push(...result.errors)
+    for (const id of result.ruleIds ?? []) listed.add(id)
     if (!result.checklist || result.errors.length) continue
     const { slug, ruleIds } = result.checklist
     const seen = new Set()
@@ -168,10 +209,10 @@ export function loadLibrary() {
       seen.add(id)
       if (!rules.has(id) && !invalid.has(id)) errors.push(`${result.checklist.path}: references missing rule '${id}'`)
     }
+    if (result.checklist.rating !== undefined) errors.push(...checkScorecardLevels(result.checklist, rules))
     checklists.set(slug, result.checklist)
   }
 
-  const listed = new Set([...checklists.values()].flatMap((c) => c.ruleIds))
   for (const rule of rules.values()) {
     if (!listed.has(rule.id)) errors.push(`${rule.path}: is in no checklist; add it to one under checklists/`)
   }

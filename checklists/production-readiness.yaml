@@ -5,6 +5,11 @@ slug: production-readiness
 version: 1
 title: Production Readiness
 description: Is this service ready for production traffic? Ownership, resilience, observability, security and deployment basics, checked against its design.
+# Also a scorecard: every service gets a Level 0 to 3 on it. The level comes
+# from each rule's priority (critical for Level 1, high for Level 2, medium for
+# Level 3); the only thing set here is the level expected of each service tier,
+# and the defaults (tier 1: Level 3, tier 2: Level 2, tier 3: Level 1) apply.
+rating: {}
 ruleIds:
   - ownership.team-set
   - ownership.oncall-set
