@@ -1,0 +1,18 @@
+{
+  "name": "microservice-rules",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rules and checklists for microservices: the content behind microservice.md/rules",
+  "type": "module",
+  "license": "Apache-2.0",
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "readme": "node scripts/render-readme.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "yaml": "^2.9.1"
+  }
+}

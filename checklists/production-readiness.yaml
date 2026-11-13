@@ -1,0 +1,34 @@
+# Curated checklist: the rules a service should meet before it takes production
+# traffic. Rule ids point at rules/<category>/<slug>.md; order here is
+# display order.
+slug: production-readiness
+version: 1
+title: Production Readiness
+description: Is this service ready for production traffic? Ownership, resilience, observability, security and deployment basics, checked against its design.
+ruleIds:
+  - ownership.team-set
+  - ownership.oncall-set
+  - ownership.runbook-present
+  - api.endpoints-described
+  - api.versioned-paths
+  - api.idempotency-keys-on-create
+  - events.published-have-schema
+  - events.published-have-broker
+  - events.publish-through-outbox
+  - events.consumers-deduplicate
+  - data.owned-data-declared
+  - resilience.hard-deps-have-timeouts
+  - resilience.hard-deps-fail-fast
+  - resilience.retry-only-idempotent
+  - observability.availability-slo
+  - observability.latency-target
+  - observability.traces-enabled
+  - observability.alerts-defined
+  - observability.dashboards-defined
+  - security.authn-defined
+  - security.authz-defined
+  - security.secrets-in-store
+  - security.pii-handling-documented
+  - deployment.min-two-replicas
+  - deployment.resource-limits
+  - decisions.accepted-adr

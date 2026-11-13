@@ -1,0 +1,24 @@
+# Curated checklist: for a service being carved out of a legacy system with
+# the strangler fig approach. Most of it is checked by hand: it is about how
+# the migration is run, which the service design alone cannot show.
+slug: strangler-migration
+version: 1
+title: Strangler Migration
+description: "Is this service being extracted from the legacy system safely? One capability at a time, behind a routing layer, with its data, a tested way back and the old code removed."
+ruleIds:
+  - architecture.bounded-context-named
+  - architecture.one-capability-at-a-time
+  - architecture.routing-layer-declared
+  - architecture.anti-corruption-layer
+  - architecture.data-moves-with-capability
+  - data.owned-data-declared
+  - architecture.legacy-calls-declared
+  - resilience.hard-deps-have-timeouts
+  - api.contract-tests
+  - architecture.parity-verified
+  - deployment.progressive-rollout
+  - deployment.cutover-by-routing
+  - deployment.rollback-rehearsed
+  - observability.alerts-defined
+  - decisions.accepted-adr
+  - architecture.legacy-retired

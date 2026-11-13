@@ -1,0 +1,23 @@
+# Curated checklist: does the service own its data, and only its data? Rules
+# about aggregates, sagas, CQRS and views apply only when the service
+# declares them.
+slug: data-ownership
+version: 1
+title: Data Ownership
+description: "Does this service own its data cleanly? No shared database, clear consistency boundaries, sagas with a way back, safe schema changes and tested backups."
+ruleIds:
+  - data.owned-data-declared
+  - data.no-shared-database
+  - data.other-services-data-via-contracts
+  - data.no-distributed-transactions
+  - data.aggregates-declared
+  - data.aggregates-have-invariants
+  - data.sagas-described
+  - data.sagas-have-compensation
+  - data.cqrs-reader-links-writer
+  - data.views-name-source
+  - data.views-rebuildable
+  - data.schema-changes-compatible
+  - data.retention-defined
+  - data.backups-restore-tested
+  - security.least-privilege-data-access

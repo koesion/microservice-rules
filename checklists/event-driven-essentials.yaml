@@ -1,0 +1,21 @@
+# Curated checklist: what a service that publishes or consumes events should
+# get right. Rules that do not fit a service (it publishes nothing, or consumes
+# nothing) step aside on their own.
+slug: event-driven-essentials
+version: 1
+title: Event-Driven Essentials
+description: "Does this service publish and consume events safely? Naming, schemas, delivery, ordering and lag, checked against its design."
+ruleIds:
+  - events.names-are-facts
+  - events.published-have-schema
+  - events.published-have-broker
+  - events.envelope-fields
+  - events.schema-evolution
+  - events.publish-through-outbox
+  - events.consumed-have-schema
+  - events.consumed-name-source
+  - events.consumers-deduplicate
+  - events.dead-letter-queue
+  - events.ordering-explicit
+  - events.eventual-consistency-explicit
+  - observability.consumer-lag-monitored

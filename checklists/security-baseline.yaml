@@ -1,0 +1,22 @@
+# Curated checklist: the security controls every service should have before it
+# takes real traffic. Rules about secrets, personal data or a gateway step aside
+# when the service has none.
+slug: security-baseline
+version: 1
+title: Security Baseline
+description: "Does this service cover the security basics? Authentication, authorization, input validation, secrets, personal data and audit, checked against its design."
+ruleIds:
+  - security.authn-defined
+  - security.authz-defined
+  - security.scopes-declared
+  - security.gateway-auth-declared
+  - security.service-to-service-auth
+  - security.input-validated
+  - security.rate-limits
+  - security.secrets-in-store
+  - security.secrets-rotatable
+  - security.pii-handling-documented
+  - security.pii-out-of-logs
+  - security.least-privilege-data-access
+  - security.audit-log
+  - security.dependencies-scanned
